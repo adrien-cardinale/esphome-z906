@@ -10,7 +10,7 @@ void Z906Number::control(float value) {
 
   switch (this->channel_) {
     case NumberChannel::VOLUME:
-      this->parent_->controlVolume(value);
+      this->parent_->setVolume(value);
       break;
   }
 }

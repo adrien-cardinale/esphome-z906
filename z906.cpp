@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <deque>
 
 #include "esphome/core/hal.h"
 #include "esphome/core/log.h"
@@ -92,9 +93,12 @@ void Z906Component::setup() {
 
 void Z906Component::loop() {
     updatePresence();
-    if(this->stable){
-        updateConsole();
-        updateAmplifier();
+    if(stable){
+        std::deque<uint8_t> console_to_amp_buffer, amp_to_console_buffer;
+        console.update(console_to_amp_buffer);
+        amplifier.update(amp_to_console_buffer);
+        for (uint8_t b : console_to_amp_buffer) amplifier.writeByte(b);
+        for (uint8_t b : amp_to_console_buffer) console.writeByte(b);
     }
     publishStates();
 }
@@ -116,55 +120,9 @@ void Z906Component::updatePresence() {
     }
 }
 
-void Z906Component::updateConsole() {
-    uint8_t data;
-    while (uartConsole->available()) {
-        if(uartConsole->read_byte(&data)) {
-            uartAmplifier->write_byte(data);
-        }
-    }
-}
-
-void Z906Component::updateAmplifier() {
-    uint8_t data;
-    while (uartAmplifier->available()) {
-        if(uartAmplifier->read_byte(&data)) {
-            uartConsole->write_byte(data);
-            onAmplifierMessage(static_cast<SerialHeader>(data));
-        }
-    }
-}
-
-void Z906Component::onAmplifierMessage(SerialHeader header) {
-  switch(header){
-    case SerialHeader::VOLUME_UP:
-      if(this->volume_ < MAX_VOLUME){
-        this->volume_++;
-      }
-      break;
-    case SerialHeader::VOLUME_DOWN:
-      if(this->volume_ > 0){
-        this->volume_--;
-      }
-      break;
-  }
-}
-
-void Z906Component::controlVolume(float percent) {
-  uint8_t target = static_cast<uint8_t>(lroundf(percent / 100.0f * MAX_VOLUME));
-
-  const SerialHeader step = (target > this->volume_) ? SerialHeader::VOLUME_UP : SerialHeader::VOLUME_DOWN;
-  const uint8_t delta = (target > this->volume_) ? (target - this->volume_) : (this->volume_ - target);
-  for(uint8_t i = 0; i < delta; i++) {
-    this->uartAmplifier->write_byte(static_cast<uint8_t>(SerialHeader::RESET_IDLE_TIME));
-    this->uartAmplifier->write_byte(static_cast<uint8_t>(step));
-    this->uartAmplifier->write_byte(static_cast<uint8_t>(SerialHeader::RESET_IDLE_TIME));
-  }
-}
-
 void Z906Component::publishStates() {
   if (this->volume_number_ != nullptr) {
-    this->volume_number_->publish_state(static_cast<float>(this->volume_) / static_cast<float>(MAX_VOLUME) * 100.0f);
+    this->volume_number_->publish_state(amplifier.getVolume());
   }
 }
 
