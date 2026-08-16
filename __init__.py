@@ -10,7 +10,7 @@ MULTI_CONF = True
 z906_ns = cg.esphome_ns.namespace("z906")
 Z906Component = z906_ns.class_("Z906Component", cg.Component)
 
-CONF_LOGI_Z906_ID = "logi_z906_id"
+CONF_Z906_ID = "z906_id"
 CONF_CONSOLE_UART_ID = "console_uart_id"
 CONF_AMP_UART_ID = "amp_uart_id"
 
