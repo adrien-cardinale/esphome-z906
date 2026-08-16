@@ -1,20 +1,22 @@
 #pragma once
-#include "esphome/components/uart/uart.h"
 #include "deque"
+#include "esphome/components/uart/uart.h"
 
 namespace esphome {
 namespace z906 {
 
 class Console {
-public:
+   public:
     void update(std::deque<uint8_t> &buffer);
-    void writeByte(uint8_t data) { if(uart) uart->write_byte(data); }
+    void writeByte(uint8_t data) {
+        if (uart) uart->write_byte(data);
+    }
 
     void setUart(uart::UARTComponent *uart) { this->uart = uart; }
 
-protected:
+   protected:
     uart::UARTComponent *uart{nullptr};
 };
 
-}
-}
+}  // namespace z906
+}  // namespace esphome

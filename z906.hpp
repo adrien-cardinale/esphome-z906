@@ -7,70 +7,72 @@
 
 #include "amplifier.hpp"
 #include "console.hpp"
-#include "serial.hpp"
-
-#include "esphome/core/component.h"
-
-#include "esp_adc/adc_oneshot.h"
 #include "esp_adc/adc_cali.h"
+#include "esp_adc/adc_oneshot.h"
+#include "esphome/core/component.h"
 #include "number/z906_number.hpp"
+#include "serial.hpp"
 
 namespace esphome {
 namespace z906 {
 
 class Z906Component : public Component {
-    public:
-        void setup() override;
-        void loop() override;
+   public:
+    void setup() override;
+    void loop() override;
 
-        void set_adc_pins(int console_presence_pin, int amplifier_presence_pin, int alim_pin);
-        void set_console_uart(uart::UARTComponent *uart) { console.setUart(uart); }
-        void set_amp_uart(uart::UARTComponent *uart) { amplifier.setUart(uart); }
-        void set_volume_number(Z906Number *number) { this->volume_number_ = number; }
+    void set_adc_pins(int console_presence_pin, int amplifier_presence_pin,
+                      int alim_pin);
+    void set_console_uart(uart::UARTComponent *uart) { console.setUart(uart); }
+    void set_amp_uart(uart::UARTComponent *uart) { amplifier.setUart(uart); }
+    void set_volume_number(Z906Number *number) {
+        this->volume_number_ = number;
+    }
 
-        void setVolume(float percent) { amplifier.setVolume(percent); }
-    protected:
-        Amplifier amplifier;
-        Console console;
+    void setVolume(float percent) { amplifier.setVolume(percent); }
 
-        struct AdcChannel {
-            adc_unit_t unit{ADC_UNIT_1};
-            adc_channel_t channel{ADC_CHANNEL_0};
-            adc_oneshot_unit_handle_t unit_handle{nullptr};
-            adc_cali_handle_t cali_handle{nullptr};
-        };
+   protected:
+    Amplifier amplifier;
+    Console console;
 
-        bool stable{false};
+    struct AdcChannel {
+        adc_unit_t unit{ADC_UNIT_1};
+        adc_channel_t channel{ADC_CHANNEL_0};
+        adc_oneshot_unit_handle_t unit_handle{nullptr};
+        adc_cali_handle_t cali_handle{nullptr};
+    };
 
-        void flush_uarts_();
+    bool stable{false};
 
-        void updateConsole();
-        void updateAmplifier();
-        void updatePresence();
-        void publishStates();
+    void flush_uarts_();
 
-        adc_oneshot_unit_handle_t get_adc_unit_handle_(adc_unit_t unit);
-        void init_adc_channel_(AdcChannel &adc, int gpio_pin);
-        float read_adc_voltage_(AdcChannel &adc);
-        void onAmplifierMessage(SerialHeader header);
+    void updateConsole();
+    void updateAmplifier();
+    void updatePresence();
+    void publishStates();
 
-        int console_presence_pin_{-1};
-        int amplifier_presence_pin_{-1};
-        int alim_pin_{-1};
+    adc_oneshot_unit_handle_t get_adc_unit_handle_(adc_unit_t unit);
+    void init_adc_channel_(AdcChannel &adc, int gpio_pin);
+    float read_adc_voltage_(AdcChannel &adc);
+    void onAmplifierMessage(SerialHeader header);
 
-        AdcChannel console_presence_adc_{};
-        AdcChannel amplifier_presence_adc_{};
-        AdcChannel alim_adc_{};
+    int console_presence_pin_{-1};
+    int amplifier_presence_pin_{-1};
+    int alim_pin_{-1};
 
-        adc_oneshot_unit_handle_t adc1_handle_{nullptr};
-        adc_oneshot_unit_handle_t adc2_handle_{nullptr};
+    AdcChannel console_presence_adc_{};
+    AdcChannel amplifier_presence_adc_{};
+    AdcChannel alim_adc_{};
 
-        uint32_t last_presence_update_{0};
+    adc_oneshot_unit_handle_t adc1_handle_{nullptr};
+    adc_oneshot_unit_handle_t adc2_handle_{nullptr};
 
-        Z906Number *volume_number_{nullptr};
+    uint32_t last_presence_update_{0};
 
-        uint8_t volume_{9};
+    Z906Number *volume_number_{nullptr};
+
+    uint8_t volume_{9};
 };
 
-}
-}
+}  // namespace z906
+}  // namespace esphome
