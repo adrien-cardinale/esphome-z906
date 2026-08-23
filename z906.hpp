@@ -65,7 +65,6 @@ class Z906Component : public Component {
     adc_oneshot_unit_handle_t get_adc_unit_handle_(adc_unit_t unit);
     void init_adc_channel_(AdcChannel &adc, int gpio_pin);
     float read_adc_voltage_(AdcChannel &adc);
-    void onAmplifierMessage(SerialHeader header);
 
     int console_presence_pin_{-1};
     int amplifier_presence_pin_{-1};

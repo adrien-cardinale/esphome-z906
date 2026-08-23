@@ -1,5 +1,6 @@
 #pragma once
 #include "deque"
+#include "vector"
 #include "esphome/components/uart/uart.h"
 #include "number/z906_number.hpp"
 #include "serial.hpp"
@@ -10,12 +11,13 @@ namespace z906 {
 
 class Amplifier {
    public:
+    void setUart(uart::UARTComponent *uart) { this->uart = uart; }
     void update(std::deque<uint8_t> &buffer);
-    void onMessage(SerialHeader header);
+    void onMessage(SerialCommand header);
     void writeByte(uint8_t data) {
         if (uart) uart->write_byte(data);
     }
-    void setUart(uart::UARTComponent *uart) { this->uart = uart; }
+    void readMultiByteMessage(std::deque<uint8_t> &buffer);
 
     void setVolume(float volume);
     float getVolume() const {

@@ -102,16 +102,18 @@ void Z906Component::setup() {
 void Z906Component::loop() {
     updatePresence();
     if (stable) {
-        if (!powerStatus) {
-            powerStatus = true;
-            ESP_LOGI(TAG, "Z906 system is stable and powered on");
-            powerBinarySensor->publish_state(true);
-        }
         std::deque<uint8_t> console_to_amp_buffer, amp_to_console_buffer;
         console.update(console_to_amp_buffer);
         amplifier.update(amp_to_console_buffer);
         for (uint8_t b : console_to_amp_buffer) amplifier.writeByte(b);
         for (uint8_t b : amp_to_console_buffer) console.writeByte(b);
+        
+        if (!powerStatus) {
+            powerStatus = true;
+            ESP_LOGI(TAG, "Z906 system is stable and powered on");
+            powerBinarySensor->publish_state(true);
+            amplifier.updateStatus();
+        }
     } else {
         if (powerStatus) {
             powerStatus = false;

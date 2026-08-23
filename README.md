@@ -43,4 +43,4 @@ z906:
 ## Acknowledgments
 
 - [nomis/logitech-z906](https://github.com/nomis/logitech-z906) - for the protocol
-- [zarpli/Logitech-Z906](https://github.com/zarpli/Logitech-Z906) - for the inspiration
+- [Jupsi/logi_z906_wifi](https://github.com/Jupsi/logi_z906_wifi) - for the inspiration
