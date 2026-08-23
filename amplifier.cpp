@@ -48,5 +48,9 @@ void Amplifier::setVolume(float volume) {
     }
 }
 
+void Amplifier::updateStatus() {
+    writeByte(static_cast<uint8_t>(SerialHeader::READ_STATUS));
+}
+
 }  // namespace z906
 }  // namespace esphome

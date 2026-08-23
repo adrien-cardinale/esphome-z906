@@ -14,14 +14,14 @@ enum class NumberChannel {
 
 class Z906Number : public number::Number, public Component {
    public:
-    void set_parent(Z906Component *parent) { this->parent_ = parent; }
-    void set_channel(NumberChannel channel) { this->channel_ = channel; }
+    void set_parent(Z906Component *parent) { this->parent = parent; }
+    void set_channel(NumberChannel channel) { this->channel = channel; }
 
    protected:
     void control(float value) override;
 
-    Z906Component *parent_{nullptr};
-    NumberChannel channel_{NumberChannel::VOLUME};
+    Z906Component *parent{nullptr};
+    NumberChannel channel{NumberChannel::VOLUME};
 };
 
 }  // namespace z906

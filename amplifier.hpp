@@ -3,6 +3,7 @@
 #include "esphome/components/uart/uart.h"
 #include "number/z906_number.hpp"
 #include "serial.hpp"
+#include "switch/z906_switch.hpp"
 
 namespace esphome {
 namespace z906 {
@@ -21,6 +22,7 @@ class Amplifier {
         return static_cast<float>(volume) / static_cast<float>(MAX_VOLUME) *
                100.0f;
     }
+    void updateStatus();
 
     friend class Z906Component;
 
@@ -33,6 +35,7 @@ class Amplifier {
 
     // ESPHome Component
     Z906Number *globalVolumeNumber{nullptr};
+    Z906Switch *statusSwitch{nullptr};
 };
 
 }  // namespace z906

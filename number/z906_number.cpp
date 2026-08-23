@@ -6,11 +6,11 @@ namespace esphome {
 namespace z906 {
 
 void Z906Number::control(float value) {
-    if (this->parent_ == nullptr) return;
+    if (this->parent == nullptr) return;
 
-    switch (this->channel_) {
+    switch (this->channel) {
         case NumberChannel::VOLUME:
-            this->parent_->setVolume(value);
+            this->parent->setVolume(value);
             break;
     }
 }

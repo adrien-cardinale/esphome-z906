@@ -12,6 +12,7 @@
 #include "esphome/core/component.h"
 #include "number/z906_number.hpp"
 #include "serial.hpp"
+#include "switch/z906_switch.hpp"
 
 namespace esphome {
 namespace z906 {
@@ -29,6 +30,11 @@ class Z906Component : public Component {
     void set_volume_number(Z906Number *number) {
         amplifier.globalVolumeNumber = number;
     }
+    void set_status_switch(Z906Switch *status_switch) {
+        amplifier.statusSwitch = status_switch;
+    }
+
+    void updateStatus() { amplifier.updateStatus(); }
 
     void setVolume(float percent) { amplifier.setVolume(percent); }
 
@@ -69,7 +75,6 @@ class Z906Component : public Component {
     adc_oneshot_unit_handle_t adc2_handle_{nullptr};
 
     uint32_t last_presence_update_{0};
-
 
     uint8_t volume_{9};
 };
