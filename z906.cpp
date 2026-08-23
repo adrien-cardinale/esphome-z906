@@ -107,7 +107,6 @@ void Z906Component::loop() {
         for (uint8_t b : console_to_amp_buffer) amplifier.writeByte(b);
         for (uint8_t b : amp_to_console_buffer) console.writeByte(b);
     }
-    publishStates();
 }
 
 void Z906Component::updatePresence() {
@@ -126,12 +125,6 @@ void Z906Component::updatePresence() {
         this->stable = true;
     } else {
         this->stable = false;
-    }
-}
-
-void Z906Component::publishStates() {
-    if (this->volume_number_ != nullptr) {
-        this->volume_number_->publish_state(amplifier.getVolume());
     }
 }
 

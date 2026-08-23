@@ -21,12 +21,13 @@ class Z906Component : public Component {
     void setup() override;
     void loop() override;
 
+    // ESPHome Config
     void set_adc_pins(int console_presence_pin, int amplifier_presence_pin,
                       int alim_pin);
     void set_console_uart(uart::UARTComponent *uart) { console.setUart(uart); }
     void set_amp_uart(uart::UARTComponent *uart) { amplifier.setUart(uart); }
     void set_volume_number(Z906Number *number) {
-        this->volume_number_ = number;
+        amplifier.globalVolumeNumber = number;
     }
 
     void setVolume(float percent) { amplifier.setVolume(percent); }
@@ -69,7 +70,6 @@ class Z906Component : public Component {
 
     uint32_t last_presence_update_{0};
 
-    Z906Number *volume_number_{nullptr};
 
     uint8_t volume_{9};
 };

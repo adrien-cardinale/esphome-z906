@@ -1,5 +1,7 @@
 #include "amplifier.hpp"
 
+#include "esphome/core/log.h"
+
 namespace esphome {
 namespace z906 {
 
@@ -9,6 +11,7 @@ void Amplifier::update(std::deque<uint8_t> &buffer) {
         if (uart->read_byte(&data)) {
             buffer.push_back(data);
             onMessage(static_cast<SerialHeader>(data));
+            ESP_LOGD("z906.amplifier", "Received byte: 0x%02X", data);
         }
     }
 }
@@ -19,11 +22,13 @@ void Amplifier::onMessage(SerialHeader header) {
             if (volume < MAX_VOLUME) {
                 volume++;
             }
+            globalVolumeNumber->publish_state(getVolume());
             break;
         case SerialHeader::VOLUME_DOWN:
             if (volume > 0) {
                 volume--;
             }
+            globalVolumeNumber->publish_state(getVolume());
             break;
     }
 }
