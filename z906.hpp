@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "amplifier.hpp"
+#include "components/binary_sensor/binary_sensor.h"
 #include "console.hpp"
 #include "esp_adc/adc_cali.h"
 #include "esp_adc/adc_oneshot.h"
@@ -32,6 +33,9 @@ class Z906Component : public Component {
     }
     void set_status_switch(Z906Switch *status_switch) {
         amplifier.statusSwitch = status_switch;
+    }
+    void set_power_binary_sensor(binary_sensor::BinarySensor *power_binary_sensor) {
+        this->powerBinarySensor = power_binary_sensor;
     }
 
     void updateStatus() { amplifier.updateStatus(); }
@@ -75,8 +79,9 @@ class Z906Component : public Component {
     adc_oneshot_unit_handle_t adc2_handle_{nullptr};
 
     uint32_t last_presence_update_{0};
+    bool powerStatus{false};
 
-    uint8_t volume_{9};
+    binary_sensor::BinarySensor *powerBinarySensor{nullptr};
 };
 
 }  // namespace z906
