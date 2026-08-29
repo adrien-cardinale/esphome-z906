@@ -1,75 +1,96 @@
 #include "amplifier.hpp"
 
+#include <cmath>
+
 #include "esphome/core/log.h"
 
 namespace esphome {
 namespace z906 {
+
+static const char *const TAG = "z906.amplifier";
 
 void Amplifier::update(std::deque<uint8_t> &buffer) {
     uint8_t data;
     while (uart->available()) {
         if (uart->read_byte(&data)) {
             buffer.push_back(data);
-            onMessage(static_cast<SerialCommand>(data));
-            ESP_LOGD("z906.amplifier", "Received byte: 0x%02X", data);
-            if (data ==
-                static_cast<uint8_t>(SerialCommand::MULTIBYTE_MESSAGE)) {
-                readMultiByteMessage(buffer);
-            }
+            feedByte(data);
         }
     }
 }
 
-void Amplifier::readMultiByteMessage(std::deque<uint8_t> &buffer) {
-    uint8_t type, length;
-    if (!uart->read_byte(&type) || !uart->read_byte(&length)) {
-        ESP_LOGE("z906.amplifier", "Failed to read multi-byte message header");
-        return;
+void Amplifier::feedByte(uint8_t data) {
+    switch (parseState) {
+        case ParseState::IDLE:
+            if (data == static_cast<uint8_t>(SerialCommand::MULTIBYTE_MESSAGE)) {
+                parseState = ParseState::TYPE;
+            } else {
+                ESP_LOGD(TAG, "Received byte: 0x%02X", data);
+                onSingleByte(static_cast<SerialCommand>(data));
+            }
+            break;
+        case ParseState::TYPE:
+            msgType = data;
+            parseState = ParseState::LENGTH;
+            break;
+        case ParseState::LENGTH:
+            msgLength = data;
+            msgPayload.clear();
+            msgPayload.reserve(msgLength);
+            parseState = (msgLength == 0) ? ParseState::CHECKSUM
+                                          : ParseState::PAYLOAD;
+            break;
+        case ParseState::PAYLOAD:
+            msgPayload.push_back(data);
+            if (msgPayload.size() >= msgLength) parseState = ParseState::CHECKSUM;
+            break;
+        case ParseState::CHECKSUM:
+            onMultiByteMessage(msgType, msgPayload, data);
+            parseState = ParseState::IDLE;
+            break;
     }
-    buffer.push_back(type);
-    buffer.push_back(length);
+}
 
-    std::vector<uint8_t> data_bytes;
-
-    for (uint8_t i = 0; i < length; ++i) {
-        uint8_t data;
-        if (!uart->read_byte(&data)) {
-            ESP_LOGE("z906.amplifier",
-                     "Failed to read multi-byte message data");
-            return;
-        }
-        buffer.push_back(data);
-        data_bytes.push_back(data);
+void Amplifier::onMultiByteMessage(uint8_t type,
+                                   const std::vector<uint8_t> &payload,
+                                   uint8_t checksum) {
+    std::string hex;
+    char tmp[4];
+    for (uint8_t b : payload) {
+        snprintf(tmp, sizeof(tmp), "%02X ", b);
+        hex += tmp;
     }
-    ESP_LOGD("z906.amplifier",
-             "Received multi-byte message: type=0x%02X, length=%d", type,
-             length);
+    ESP_LOGD(TAG, "Multi-byte message: type=0x%02X len=%u checksum=0x%02X [%s]",
+             type, static_cast<unsigned>(payload.size()), checksum,
+             hex.c_str());
 
     switch (static_cast<SerialMultiByteType>(type)) {
         case SerialMultiByteType::AMP_STATUS:
-            ESP_LOGD("z906.amplifier", "AMP_STATUS data: %s",
-                     std::string(data_bytes.begin(), data_bytes.end()).c_str());
+            if (!payload.empty() && payload[0] <= MAX_VOLUME) {
+                volume = payload[0];
+                if (globalVolumeNumber)
+                    globalVolumeNumber->publish_state(getVolume());
+            }
             break;
         default:
-            ESP_LOGW("z906.amplifier",
-                     "Unknown multi-byte message type: 0x%02X", type);
+            ESP_LOGW(TAG, "Unknown multi-byte message type: 0x%02X", type);
             break;
     }
 }
 
-void Amplifier::onMessage(SerialCommand header) {
+void Amplifier::onSingleByte(SerialCommand header) {
     switch (header) {
         case SerialCommand::VOLUME_UP:
-            if (volume < MAX_VOLUME) {
-                volume++;
-            }
-            globalVolumeNumber->publish_state(getVolume());
+            if (volume < MAX_VOLUME) volume++;
+            if (globalVolumeNumber)
+                globalVolumeNumber->publish_state(getVolume());
             break;
         case SerialCommand::VOLUME_DOWN:
-            if (volume > 0) {
-                volume--;
-            }
-            globalVolumeNumber->publish_state(getVolume());
+            if (volume > 0) volume--;
+            if (globalVolumeNumber)
+                globalVolumeNumber->publish_state(getVolume());
+            break;
+        default:
             break;
     }
 }

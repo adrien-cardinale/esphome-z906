@@ -13,11 +13,9 @@ class Amplifier {
    public:
     void setUart(uart::UARTComponent *uart) { this->uart = uart; }
     void update(std::deque<uint8_t> &buffer);
-    void onMessage(SerialCommand header);
     void writeByte(uint8_t data) {
         if (uart) uart->write_byte(data);
     }
-    void readMultiByteMessage(std::deque<uint8_t> &buffer);
 
     void setVolume(float vol);
     float getVolume() const {
@@ -29,11 +27,23 @@ class Amplifier {
     friend class Z906Component;
 
    protected:
+    enum class ParseState : uint8_t { IDLE, TYPE, LENGTH, PAYLOAD, CHECKSUM };
+
+    void feedByte(uint8_t data);
+    void onSingleByte(SerialCommand header);
+    void onMultiByteMessage(uint8_t type, const std::vector<uint8_t> &payload,
+                            uint8_t checksum);
+
     uart::UARTComponent *uart{nullptr};
 
     static constexpr uint8_t MAX_VOLUME = 43;
 
     uint8_t volume{9};
+
+    ParseState parseState{ParseState::IDLE};
+    uint8_t msgType{0};
+    uint8_t msgLength{0};
+    std::vector<uint8_t> msgPayload;
 
     // ESPHome Component
     Z906Number *globalVolumeNumber{nullptr};
