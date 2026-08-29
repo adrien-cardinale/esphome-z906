@@ -106,13 +106,25 @@ void Z906Component::loop() {
     for (uint8_t b : console_to_amp_buffer) amplifier.writeByte(b);
     for (uint8_t b : amp_to_console_buffer) console.writeByte(b);
 
+    if (!console_to_amp_buffer.empty()) {
+        if (statusQueryPending) {
+            this->set_timeout("z906_status", 2000,
+                              [this]() { updateStatus(); });
+        }
+    }
+
     updatePresence();
     if (stable != powerStatus) {
         powerStatus = stable;
         if (stable) {
             ESP_LOGI(TAG, "Z906 system is stable and powered on");
+            statusQueryPending = true;
+            this->set_timeout("z906_status", 2000,
+                              [this]() { updateStatus(); });
         } else {
             ESP_LOGW(TAG, "Z906 system is unstable or powered off");
+            statusQueryPending = false;
+            this->cancel_timeout("z906_status");
         }
         if (powerBinarySensor) powerBinarySensor->publish_state(stable);
     }
@@ -135,6 +147,11 @@ void Z906Component::updatePresence() {
     } else {
         this->stable = false;
     }
+}
+
+void Z906Component::updateStatus() {
+    statusQueryPending = false;
+    amplifier.updateStatus();
 }
 
 }  // namespace z906

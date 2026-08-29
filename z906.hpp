@@ -38,7 +38,7 @@ class Z906Component : public Component {
         this->powerBinarySensor = power_binary_sensor;
     }
 
-    void updateStatus() { amplifier.updateStatus(); }
+    void updateStatus();
 
     void setVolume(float percent) { amplifier.setVolume(percent); }
 
@@ -54,6 +54,7 @@ class Z906Component : public Component {
     };
 
     bool stable{false};
+    bool statusQueryPending{false};
 
     void flush_uarts_();
 

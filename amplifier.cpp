@@ -66,6 +66,8 @@ void Amplifier::onMultiByteMessage(uint8_t type,
 
     switch (static_cast<SerialMultiByteType>(type)) {
         case SerialMultiByteType::AMP_STATUS:
+        ESP_LOGD(TAG, "Received amplifier status message");
+        ESP_LOGD(TAG, "Payload: %s", hex.c_str());
             if (!payload.empty() && payload[0] <= MAX_VOLUME) {
                 volume = payload[0];
                 if (globalVolumeNumber)
