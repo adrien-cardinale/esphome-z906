@@ -12,6 +12,7 @@
 #include "esp_adc/adc_oneshot.h"
 #include "esphome/core/component.h"
 #include "number/z906_number.hpp"
+#include "select/z906_select.hpp"
 #include "serial.hpp"
 #include "switch/z906_switch.hpp"
 
@@ -31,16 +32,23 @@ class Z906Component : public Component {
     void set_volume_number(Z906Number *number) {
         amplifier.globalVolumeNumber = number;
     }
+    void set_input_select(Z906Select *select) {
+        amplifier.inputSelect = select;
+    }
     void set_status_switch(Z906Switch *status_switch) {
         amplifier.statusSwitch = status_switch;
     }
-    void set_power_binary_sensor(binary_sensor::BinarySensor *power_binary_sensor) {
+    void set_power_binary_sensor(
+        binary_sensor::BinarySensor *power_binary_sensor) {
         this->powerBinarySensor = power_binary_sensor;
     }
 
     void updateStatus();
 
     void setVolume(float percent) { amplifier.setVolume(percent); }
+    void controlInput(const std::string &input) {
+        amplifier.controlInput(input);
+    }
 
    protected:
     Amplifier amplifier;

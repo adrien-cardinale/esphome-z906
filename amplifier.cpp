@@ -22,7 +22,8 @@ void Amplifier::update(std::deque<uint8_t> &buffer) {
 void Amplifier::feedByte(uint8_t data) {
     switch (parseState) {
         case ParseState::IDLE:
-            if (data == static_cast<uint8_t>(SerialCommand::MULTIBYTE_MESSAGE)) {
+            if (data ==
+                static_cast<uint8_t>(SerialCommand::MULTIBYTE_MESSAGE)) {
                 parseState = ParseState::TYPE;
             } else {
                 ESP_LOGD(TAG, "Received byte: 0x%02X", data);
@@ -37,12 +38,13 @@ void Amplifier::feedByte(uint8_t data) {
             msgLength = data;
             msgPayload.clear();
             msgPayload.reserve(msgLength);
-            parseState = (msgLength == 0) ? ParseState::CHECKSUM
-                                          : ParseState::PAYLOAD;
+            parseState =
+                (msgLength == 0) ? ParseState::CHECKSUM : ParseState::PAYLOAD;
             break;
         case ParseState::PAYLOAD:
             msgPayload.push_back(data);
-            if (msgPayload.size() >= msgLength) parseState = ParseState::CHECKSUM;
+            if (msgPayload.size() >= msgLength)
+                parseState = ParseState::CHECKSUM;
             break;
         case ParseState::CHECKSUM:
             onMultiByteMessage(msgType, msgPayload, data);
@@ -66,8 +68,8 @@ void Amplifier::onMultiByteMessage(uint8_t type,
 
     switch (static_cast<SerialMultiByteType>(type)) {
         case SerialMultiByteType::AMP_STATUS:
-        ESP_LOGD(TAG, "Received amplifier status message");
-        ESP_LOGD(TAG, "Payload: %s", hex.c_str());
+            ESP_LOGD(TAG, "Received amplifier status message");
+            ESP_LOGD(TAG, "Payload: %s", hex.c_str());
             if (!payload.empty() && payload[0] <= MAX_VOLUME) {
                 volume = payload[0];
                 if (globalVolumeNumber)
@@ -98,8 +100,7 @@ void Amplifier::onSingleByte(SerialCommand header) {
 }
 
 void Amplifier::setVolume(float vol) {
-    uint8_t target =
-        static_cast<uint8_t>(lroundf(vol / 100.0f * MAX_VOLUME));
+    uint8_t target = static_cast<uint8_t>(lroundf(vol / 100.0f * MAX_VOLUME));
 
     const SerialCommand direction = (target > volume)
                                         ? SerialCommand::VOLUME_UP
@@ -109,6 +110,33 @@ void Amplifier::setVolume(float vol) {
     for (uint8_t i = 0; i < delta; i++) {
         writeByte(static_cast<uint8_t>(direction));
     }
+}
+
+void Amplifier::controlInput(const std::string &input) {
+    float currentVolume = getVolume();
+    setVolume(0.0f);
+
+    static const struct {
+        const char *name;
+        SerialCommand cmd;
+    } INPUTS[] = {
+        {"Input 1", SerialCommand::INPUT_1}, {"Input 2", SerialCommand::INPUT_2},
+        {"Input 3", SerialCommand::INPUT_3}, {"Input 4", SerialCommand::INPUT_4},
+        {"Input 5", SerialCommand::INPUT_5}, {"Input 6", SerialCommand::INPUT_6},
+    };
+
+    bool found = false;
+    for (const auto &entry : INPUTS) {
+        if (input == entry.name) {
+            writeByte(static_cast<uint8_t>(entry.cmd));
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        ESP_LOGW(TAG, "Unknown input: %s", input.c_str());
+    }
+    setVolume(currentVolume);
 }
 
 void Amplifier::updateStatus() {

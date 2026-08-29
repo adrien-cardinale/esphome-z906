@@ -1,10 +1,11 @@
 #pragma once
 #include "deque"
-#include "vector"
 #include "esphome/components/uart/uart.h"
 #include "number/z906_number.hpp"
+#include "select/z906_select.hpp"
 #include "serial.hpp"
 #include "switch/z906_switch.hpp"
+#include "vector"
 
 namespace esphome {
 namespace z906 {
@@ -22,6 +23,7 @@ class Amplifier {
         return static_cast<float>(volume) / static_cast<float>(MAX_VOLUME) *
                100.0f;
     }
+    void controlInput(const std::string &input);
     void updateStatus();
 
     friend class Z906Component;
@@ -48,6 +50,7 @@ class Amplifier {
     // ESPHome Component
     Z906Number *globalVolumeNumber{nullptr};
     Z906Switch *statusSwitch{nullptr};
+    Z906Select *inputSelect{nullptr};
 };
 
 }  // namespace z906
