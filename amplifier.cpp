@@ -12,7 +12,8 @@ void Amplifier::update(std::deque<uint8_t> &buffer) {
             buffer.push_back(data);
             onMessage(static_cast<SerialCommand>(data));
             ESP_LOGD("z906.amplifier", "Received byte: 0x%02X", data);
-            if (data == static_cast<uint8_t>(SerialCommand::MULTIBYTE_MESSAGE)) {
+            if (data ==
+                static_cast<uint8_t>(SerialCommand::MULTIBYTE_MESSAGE)) {
                 readMultiByteMessage(buffer);
             }
         }
@@ -33,13 +34,16 @@ void Amplifier::readMultiByteMessage(std::deque<uint8_t> &buffer) {
     for (uint8_t i = 0; i < length; ++i) {
         uint8_t data;
         if (!uart->read_byte(&data)) {
-            ESP_LOGE("z906.amplifier", "Failed to read multi-byte message data");
+            ESP_LOGE("z906.amplifier",
+                     "Failed to read multi-byte message data");
             return;
         }
         buffer.push_back(data);
         data_bytes.push_back(data);
     }
-    ESP_LOGD("z906.amplifier", "Received multi-byte message: type=0x%02X, length=%d", type, length);
+    ESP_LOGD("z906.amplifier",
+             "Received multi-byte message: type=0x%02X, length=%d", type,
+             length);
 
     switch (static_cast<SerialMultiByteType>(type)) {
         case SerialMultiByteType::AMP_STATUS:
@@ -47,7 +51,8 @@ void Amplifier::readMultiByteMessage(std::deque<uint8_t> &buffer) {
                      std::string(data_bytes.begin(), data_bytes.end()).c_str());
             break;
         default:
-            ESP_LOGW("z906.amplifier", "Unknown multi-byte message type: 0x%02X", type);
+            ESP_LOGW("z906.amplifier",
+                     "Unknown multi-byte message type: 0x%02X", type);
             break;
     }
 }
@@ -69,12 +74,13 @@ void Amplifier::onMessage(SerialCommand header) {
     }
 }
 
-void Amplifier::setVolume(float volume) {
+void Amplifier::setVolume(float vol) {
     uint8_t target =
-        static_cast<uint8_t>(lroundf(volume / 100.0f * MAX_VOLUME));
+        static_cast<uint8_t>(lroundf(vol / 100.0f * MAX_VOLUME));
 
-    const SerialCommand direction =
-        (target > volume) ? SerialCommand::VOLUME_UP : SerialCommand::VOLUME_DOWN;
+    const SerialCommand direction = (target > volume)
+                                        ? SerialCommand::VOLUME_UP
+                                        : SerialCommand::VOLUME_DOWN;
     const uint8_t delta =
         (target > volume) ? (target - volume) : (volume - target);
     for (uint8_t i = 0; i < delta; i++) {

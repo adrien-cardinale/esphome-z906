@@ -19,7 +19,7 @@ class Amplifier {
     }
     void readMultiByteMessage(std::deque<uint8_t> &buffer);
 
-    void setVolume(float volume);
+    void setVolume(float vol);
     float getVolume() const {
         return static_cast<float>(volume) / static_cast<float>(MAX_VOLUME) *
                100.0f;
