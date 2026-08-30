@@ -19,7 +19,7 @@ enum class SerialCommand : uint8_t {
 
     VOLUME_UP = 0x08,
     VOLUME_DOWN = 0x09,
-    
+
     EFFECT_3D = 0x14,
     EFFECT_4_1 = 0x15,
     EFFECT_2_1 = 0x16,
@@ -70,5 +70,5 @@ constexpr std::optional<SerialCommand> getInputCommand(std::string_view s) {
     return it != inputs.end() ? std::optional{it->command} : std::nullopt;
 }
 
-}
+}  // namespace z906
 }  // namespace esphome

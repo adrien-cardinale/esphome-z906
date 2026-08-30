@@ -13,8 +13,7 @@ enum class SelectChannel {
     EFFECT_CHANNEL,
 };
 
-class Z906Select : public select::Select,
-    public Component {
+class Z906Select : public select::Select, public Component {
    public:
     void set_parent(Z906Component *parent) { this->parent_ = parent; }
     void set_channel(SelectChannel channel) { this->channel_ = channel; }

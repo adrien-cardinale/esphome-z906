@@ -1,12 +1,12 @@
 #include "z906_select.hpp"
+
 #include "../z906.hpp"
 
 namespace esphome {
 namespace z906 {
 
 void Z906Select::control(const std::string &value) {
-    if (this->parent_ == nullptr)
-        return;
+    if (this->parent_ == nullptr) return;
 
     switch (this->channel_) {
         case SelectChannel::INPUT_CHANNEL:
@@ -18,5 +18,5 @@ void Z906Select::control(const std::string &value) {
     }
 }
 
-}
-}
+}  // namespace z906
+}  // namespace esphome

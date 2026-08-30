@@ -1,4 +1,5 @@
 #include "console.hpp"
+
 #include "esphome/core/log.h"
 
 namespace esphome {
