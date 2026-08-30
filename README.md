@@ -11,6 +11,7 @@ ESPHome component that sits between the Logitech Z906 console and amplifier UART
 - Monitors power supply state via ADC pin
 - Controls principal volume via Home Assistant number entity
 - Controls input source via Home Assistant select entity
+- Controls effect mode via Home Assistant select entity
 
 ## Configuration
 
@@ -37,11 +38,15 @@ z906:
     z906_id: z906_controller
     volume:
       name: "Z906 Volume"
+
   select:
   - platform: z906
     z906_id: z906_controller
-    source:
-      name: "Z906 Source"
+    input:
+      name: "Z906 Input"
+    effect:
+      name: "Z906 Effect"
+
   binary_sensor:
   - platform: z906
     z906_id: z906_controller
