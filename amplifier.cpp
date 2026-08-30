@@ -113,6 +113,18 @@ void Amplifier::onSingleByte(SerialCommand header) {
         case SerialCommand::INPUT_6:
             if (inputSelect) inputSelect->publish_state("Input 6");
             break;
+        case SerialCommand::EFFECT_3D:
+            if (effectSelect) effectSelect->publish_state("3D");
+            break;
+        case SerialCommand::EFFECT_2_1:
+            if (effectSelect) effectSelect->publish_state("2.1");
+            break;
+        case SerialCommand::EFFECT_4_1:
+            if (effectSelect) effectSelect->publish_state("4.1");
+            break;
+        case SerialCommand::EFFECT_DISABLED:
+            if (effectSelect) effectSelect->publish_state("None");
+            break;
         default:
             break;
     }
