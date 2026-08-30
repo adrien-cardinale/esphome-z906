@@ -31,6 +31,7 @@ class Z906Component : public Component {
     void set_amp_uart(uart::UARTComponent *uart) { amplifier.setUart(uart); }
     void set_volume_number(Z906Number *number) {
         amplifier.globalVolumeNumber = number;
+        amplifier.globalVolumeNumber->traits.set_step(1.0f);
     }
     void set_input_select(Z906Select *select) {
         amplifier.inputSelect = select;
