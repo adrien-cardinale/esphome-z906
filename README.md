@@ -8,7 +8,9 @@ ESPHome component that sits between the Logitech Z906 console and amplifier UART
 ## Features
 - Relays traffic between the console and amplifier UART lines
 - Monitors console and amplifier presence via ADC pins
+- Monitors power supply state via ADC pin
 - Controls principal volume via Home Assistant number entity
+- Controls input source via Home Assistant select entity
 
 ## Configuration
 
@@ -35,6 +37,16 @@ z906:
     z906_id: z906_controller
     volume:
       name: "Z906 Volume"
+  select:
+  - platform: z906
+    z906_id: z906_controller
+    source:
+      name: "Z906 Source"
+  binary_sensor:
+  - platform: z906
+    z906_id: z906_controller
+    power:
+      name: "Z906 Power"
 ```
 
 - `console_uart_id` / `amp_uart_id`: UART buses connected to the console and amplifier respectively (required).
