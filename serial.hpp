@@ -51,5 +51,24 @@ constexpr std::optional<SerialCommand> getEffectCommand(std::string_view s) {
     return it != effects.end() ? std::optional{it->command} : std::nullopt;
 }
 
+struct Input {
+    std::string_view input;
+    SerialCommand command;
+};
+
+inline constexpr std::array<Input, 6> inputs = {{
+    {"Input 1", SerialCommand::INPUT_1},
+    {"Input 2", SerialCommand::INPUT_2},
+    {"Input 3", SerialCommand::INPUT_3},
+    {"Input 4", SerialCommand::INPUT_4},
+    {"Input 5", SerialCommand::INPUT_5},
+    {"Input 6", SerialCommand::INPUT_6},
+}};
+
+constexpr std::optional<SerialCommand> getInputCommand(std::string_view s) {
+    auto it = std::ranges::find(inputs, s, &Input::input);
+    return it != inputs.end() ? std::optional{it->command} : std::nullopt;
+}
+
 }
 }  // namespace esphome

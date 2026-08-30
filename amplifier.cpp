@@ -147,31 +147,19 @@ void Amplifier::controlInput(const std::string &input) {
     ESP_LOGD(TAG, "Controlling input: %s (volume %u)", input.c_str(), volume);
 
     const uint8_t savedVolume = volume;
-    for (uint8_t i = 0; i < savedVolume; i++)
+    for (uint8_t i = 0; i < savedVolume; i++){
         writeByte(static_cast<uint8_t>(SerialCommand::VOLUME_DOWN));
-
-    static const struct {
-        const char *name;
-        SerialCommand cmd;
-    } INPUTS[] = {
-        {"Input 1", SerialCommand::INPUT_1}, {"Input 2", SerialCommand::INPUT_2},
-        {"Input 3", SerialCommand::INPUT_3}, {"Input 4", SerialCommand::INPUT_4},
-        {"Input 5", SerialCommand::INPUT_5}, {"Input 6", SerialCommand::INPUT_6},
-    };
-
-    bool found = false;
-    for (const auto &entry : INPUTS) {
-        if (input == entry.name) {
-            writeByte(static_cast<uint8_t>(entry.cmd));
-            found = true;
-            break;
-        }
     }
-    if (!found) {
+    
+    if (auto cmd = getInputCommand(input)) {
+        writeByte(static_cast<uint8_t>(cmd.value()));
+    } else {
         ESP_LOGW(TAG, "Unknown input: %s", input.c_str());
     }
-    for (uint8_t i = 0; i < savedVolume; i++)
+    
+    for (uint8_t i = 0; i < savedVolume; i++){
         writeByte(static_cast<uint8_t>(SerialCommand::VOLUME_UP));
+    }
 }
 
 void Amplifier::controlEffect(const std::string &effect){
