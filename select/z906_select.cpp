@@ -12,6 +12,9 @@ void Z906Select::control(const std::string &value) {
         case SelectChannel::INPUT_CHANNEL:
             this->parent_->controlInput(value);
             break;
+        case SelectChannel::EFFECT_CHANNEL:
+            this->parent_->controlEffect(value);
+            break;
     }
 }
 

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "deque"
 #include "esphome/components/uart/uart.h"
 #include "number/z906_number.hpp"
@@ -24,6 +25,7 @@ class Amplifier {
                100.0f;
     }
     void controlInput(const std::string &input);
+    void controlEffect(const std::string &effect);
     void updateStatus();
 
     friend class Z906Component;
@@ -51,6 +53,7 @@ class Amplifier {
     Z906Number *globalVolumeNumber{nullptr};
     Z906Switch *statusSwitch{nullptr};
     Z906Select *inputSelect{nullptr};
+    Z906Select *effectSelect{nullptr};
 };
 
 }  // namespace z906

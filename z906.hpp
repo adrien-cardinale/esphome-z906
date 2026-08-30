@@ -36,6 +36,9 @@ class Z906Component : public Component {
     void set_input_select(Z906Select *select) {
         amplifier.inputSelect = select;
     }
+    void set_effect_select(Z906Select *select) {
+        amplifier.effectSelect = select;
+    }
     void set_status_switch(Z906Switch *status_switch) {
         amplifier.statusSwitch = status_switch;
     }
@@ -49,6 +52,9 @@ class Z906Component : public Component {
     void setVolume(float percent) { amplifier.setVolume(percent); }
     void controlInput(const std::string &input) {
         amplifier.controlInput(input);
+    }
+    void controlEffect(const std::string &effect) {
+        amplifier.controlEffect(effect);
     }
 
    protected:

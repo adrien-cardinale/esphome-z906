@@ -10,6 +10,7 @@ class Z906Component;
 
 enum class SelectChannel {
     INPUT_CHANNEL,
+    EFFECT_CHANNEL,
 };
 
 class Z906Select : public select::Select,

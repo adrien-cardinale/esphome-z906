@@ -9,11 +9,14 @@ z906Select = z906_ns.class_("Z906Select", select.Select, cg.Component)
 SelectChannel = z906_ns.enum("SelectChannel", is_class=True)
 
 CONF_INPUT = "input"
+CON_EFFECT = "effect"
 
 INPUT_OPTIONS = ["Input 1", "Input 2", "Input 3", "Input 4", "Input 5", "Input 6"]
+EFFECT_OPTIONS = ["3D", "2.1", "4.1", "None"]
 
 CHANNELS = {
     CONF_INPUT: ("set_input_select", SelectChannel.INPUT_CHANNEL, INPUT_OPTIONS, "mdi:import"),
+    CON_EFFECT: ("set_effect_select", SelectChannel.EFFECT_CHANNEL, EFFECT_OPTIONS, "mdi:surround-sound"),
 }
 
 def _channel_schema(icon):

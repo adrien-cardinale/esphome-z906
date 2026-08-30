@@ -162,6 +162,16 @@ void Amplifier::controlInput(const std::string &input) {
         writeByte(static_cast<uint8_t>(SerialCommand::VOLUME_UP));
 }
 
+void Amplifier::controlEffect(const std::string &effect){
+    ESP_LOGD(TAG, "Controlling effect: %s ", effect.c_str());
+
+    if (auto cmd = getEffectCommand(effect)) {
+        writeByte(static_cast<uint8_t>(cmd.value()));
+    } else {
+        ESP_LOGW(TAG, "Unknown effect: %s", effect.c_str());
+    }
+}
+
 void Amplifier::updateStatus() {
     writeByte(static_cast<uint8_t>(SerialCommand::GET_STATUS));
 }
