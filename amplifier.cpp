@@ -72,6 +72,7 @@ void Amplifier::onMultiByteMessage(uint8_t type,
             ESP_LOGD(TAG, "Payload: %s", hex.c_str());
             if (!payload.empty() && payload[0] <= MAX_VOLUME) {
                 volume = payload[0];
+                inputSelect->publish_state("Input " + std::to_string(payload[4] + 1));
                 if (globalVolumeNumber)
                     globalVolumeNumber->publish_state(getVolume());
             }
@@ -94,6 +95,24 @@ void Amplifier::onSingleByte(SerialCommand header) {
             if (globalVolumeNumber)
                 globalVolumeNumber->publish_state(getVolume());
             break;
+        case SerialCommand::INPUT_1:
+            if (inputSelect) inputSelect->publish_state("Input 1");
+            break;
+        case SerialCommand::INPUT_2:
+            if (inputSelect) inputSelect->publish_state("Input 2");
+            break;
+        case SerialCommand::INPUT_3:
+            if (inputSelect) inputSelect->publish_state("Input 3");
+            break;
+        case SerialCommand::INPUT_4:
+            if (inputSelect) inputSelect->publish_state("Input 4");
+            break;
+        case SerialCommand::INPUT_5:
+            if (inputSelect) inputSelect->publish_state("Input 5");
+            break;
+        case SerialCommand::INPUT_6:
+            if (inputSelect) inputSelect->publish_state("Input 6");
+            break;
         default:
             break;
     }
@@ -113,8 +132,11 @@ void Amplifier::setVolume(float vol) {
 }
 
 void Amplifier::controlInput(const std::string &input) {
-    float currentVolume = getVolume();
-    setVolume(0.0f);
+    ESP_LOGD(TAG, "Controlling input: %s (volume %u)", input.c_str(), volume);
+
+    const uint8_t savedVolume = volume;
+    for (uint8_t i = 0; i < savedVolume; i++)
+        writeByte(static_cast<uint8_t>(SerialCommand::VOLUME_DOWN));
 
     static const struct {
         const char *name;
@@ -136,7 +158,8 @@ void Amplifier::controlInput(const std::string &input) {
     if (!found) {
         ESP_LOGW(TAG, "Unknown input: %s", input.c_str());
     }
-    setVolume(currentVolume);
+    for (uint8_t i = 0; i < savedVolume; i++)
+        writeByte(static_cast<uint8_t>(SerialCommand::VOLUME_UP));
 }
 
 void Amplifier::updateStatus() {
